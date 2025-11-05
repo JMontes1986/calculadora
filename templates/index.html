@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profe Números - Práctica de Matemáticas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .nivel-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nivel-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .nivel-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .nivel-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .problema-container {
+            background: #f8f9ff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .problema {
+            font-size: 3em;
+            color: #333;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .hint {
+            color: #666;
+            font-style: italic;
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+        
+        .respuesta-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        input[type="number"] {
+            font-size: 2em;
+            padding: 15px;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            width: 150px;
+            text-align: center;
+        }
+        
+        button {
+            font-size: 1.2em;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        
+        .feedback {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            display: none;
+        }
+        
+        .feedback.correcto {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .feedback.incorrecto {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .estadisticas {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 15px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-num {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .problema {
+                font-size: 2em;
+            }
+            
+            input[type="number"] {
+                width: 120px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Profe Números</h1>
+        <p class="subtitle">¡Practica matemáticas de forma divertida!</p>
+        
+        <div class="nivel-selector">
+            <button class="nivel-btn" data-nivel="1-2">Grados 1-2</button>
+            <button class="nivel-btn active" data-nivel="2-3">Grados 2-3</button>
+            <button class="nivel-btn" data-nivel="4-5">Grados 4-5</button>
+        </div>
+        
+        <div class="problema-container">
+            <div class="problema" id="problema">Cargando...</div>
+            <div class="hint" id="hint"></div>
+            
+            <div class="respuesta-container">
+                <input type="number" id="respuesta" placeholder="?" autofocus>
+                <button onclick="verificarRespuesta()">✓ Comprobar</button>
+            </div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="estadisticas">
+            <div class="stat">
+                <div class="stat-num" id="correctas">0</div>
+                <div class="stat-label">Correctas ✓</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" id="total">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" id="racha">0</div>
+                <div class="stat-label">Racha 🔥</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let nivelActual = '2-3';
+        let problemaActual = null;
+        let estadisticas = {
+            correctas: 0,
+            total: 0,
+            racha: 0
+        };
+        
+        // Selección de nivel
+        document.querySelectorAll('.nivel-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nivel-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                nivelActual = this.dataset.nivel;
+                cargarProblema();
+            });
+        });
+        
+        // Enter para enviar
+        document.getElementById('respuesta').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarRespuesta();
+            }
+        });
+        
+        async function cargarProblema() {
+            try {
+                const response = await fetch('/api/problema', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        gradeBand: nivelActual,
+                        previous: problemaActual
+                    })
+                });
+                
+                const data = await response.json();
+                problemaActual = data.next_problem;
+                
+                document.getElementById('problema').textContent = 
+                    `${data.next_problem.a} ${data.next_problem.op} ${data.next_problem.b} = ?`;
+                document.getElementById('hint').textContent = data.hint;
+                document.getElementById('respuesta').value = '';
+                document.getElementById('respuesta').focus();
+                document.getElementById('feedback').style.display = 'none';
+                
+                // Guardar explanation para mostrar si se equivoca
+                problemaActual.explanation = data.explanation_if_wrong;
+                problemaActual.encouragement = data.encouragement;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        async function verificarRespuesta() {
+            const respuesta = parseInt(document.getElementById('respuesta').value);
+            
+            if (isNaN(respuesta)) {
+                alert('Por favor ingresa un número');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/respuesta', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        a: problemaActual.a,
+                        b: problemaActual.b,
+                        op: problemaActual.op,
+                        respuesta: respuesta
+                    })
+                });
+                
+                const data = await response.json();
+                const feedback = document.getElementById('feedback');
+                
+                estadisticas.total++;
+                
+                if (data.correcta) {
+                    estadisticas.correctas++;
+                    estadisticas.racha++;
+                    feedback.className = 'feedback correcto';
+                    feedback.innerHTML = `¡Correcto! ${problemaActual.encouragement} 🎉`;
+                } else {
+                    estadisticas.racha = 0;
+                    feedback.className = 'feedback incorrecto';
+                    feedback.innerHTML = `
+                        La respuesta correcta es ${data.respuesta_correcta}. <br>
+                        ${problemaActual.explanation}
+                    `;
+                }
+                
+                feedback.style.display = 'block';
+                actualizarEstadisticas();
+                
+                // Cargar nuevo problema después de 3 segundos
+                setTimeout(cargarProblema, 3000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        function actualizarEstadisticas() {
+            document.getElementById('correctas').textContent = estadisticas.correctas;
+            document.getElementById('total').textContent = estadisticas.total;
+            document.getElementById('racha').textContent = estadisticas.racha;
+        }
+        
+        // Cargar primer problema
+        cargarProblema();
+    </script>
+</body>
+</html>
